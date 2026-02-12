@@ -8,7 +8,7 @@ st.set_page_config(page_title="Manufacturing App", layout="centered")
 st.title("🏭 Manufacturing Prediction App")
 
 # -----------------------------
-# Get features from backend
+# Fetch feature columns from API
 # -----------------------------
 try:
     features = requests.get(f"{API_URL}/features").json()["feature_columns"]
@@ -18,14 +18,12 @@ except:
 
 st.write("Fill feature values below:")
 
-user_data = {}
-
 # -----------------------------
-# Dropdown selections
+# Dropdown UI (human-friendly)
 # -----------------------------
-shift_choice = st.selectbox("Shift", ["Evening", "Night"])
-machine_choice = st.selectbox("Machine Type", ["Type_B", "Type_C"])
-material_choice = st.selectbox("Material Grade", ["Premium", "Standard"])
+shift_choice = st.selectbox("Shift", ["Day", "Evening", "Night"])
+machine_choice = st.selectbox("Machine Type", ["Type_A", "Type_B", "Type_C"])
+material_choice = st.selectbox("Material Grade", ["Standard", "Premium"])
 day_choice = st.selectbox(
     "Day of Week",
     ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
@@ -34,42 +32,56 @@ day_choice = st.selectbox(
 st.divider()
 
 # -----------------------------
-# Add numeric inputs ONLY for non-onehot columns
+# Create default input dict (all zeros)
 # -----------------------------
-onehot_prefixes = [
+user_data = {feat: 0.0 for feat in features}
+
+# -----------------------------
+# Numeric input fields (only real numeric ones)
+# Ignore one-hot fields because dropdown will handle them
+# -----------------------------
+one_hot_prefixes = (
     "Shift_",
     "Machine_Type_",
     "Material_Grade_",
     "Day_of_Week_"
-]
+)
 
 for feat in features:
-    # skip one-hot columns (handled by dropdowns)
-    if any(feat.startswith(prefix) for prefix in onehot_prefixes):
+    if feat.startswith(one_hot_prefixes):
         continue
-
     user_data[feat] = st.number_input(feat, value=0.0)
 
 # -----------------------------
-# Now add one-hot values from dropdowns
+# Apply dropdown values into one-hot columns
 # -----------------------------
-# Shift
-user_data["Shift_Evening"] = 1.0 if shift_choice == "Evening" else 0.0
-user_data["Shift_Night"] = 1.0 if shift_choice == "Night" else 0.0
 
-# Machine Type
-user_data["Machine_Type_Type_B"] = 1.0 if machine_choice == "Type_B" else 0.0
-user_data["Machine_Type_Type_C"] = 1.0 if machine_choice == "Type_C" else 0.0
+# Shift encoding
+# (your dataset uses Shift_Evening and Shift_Night, Day means both 0)
+if "Shift_Evening" in features:
+    user_data["Shift_Evening"] = 1.0 if shift_choice == "Evening" else 0.0
+if "Shift_Night" in features:
+    user_data["Shift_Night"] = 1.0 if shift_choice == "Night" else 0.0
 
-# Material Grade
-user_data["Material_Grade_Premium"] = 1.0 if material_choice == "Premium" else 0.0
-user_data["Material_Grade_Standard"] = 1.0 if material_choice == "Standard" else 0.0
+# Machine type encoding
+# (Type_A is baseline -> no column)
+if "Machine_Type_Type_B" in features:
+    user_data["Machine_Type_Type_B"] = 1.0 if machine_choice == "Type_B" else 0.0
+if "Machine_Type_Type_C" in features:
+    user_data["Machine_Type_Type_C"] = 1.0 if machine_choice == "Type_C" else 0.0
 
-# Day of Week
-days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-for d in days:
-    col_name = f"Day_of_Week_{d}"
-    user_data[col_name] = 1.0 if day_choice == d else 0.0
+# Material grade encoding
+# (maybe both columns exist)
+if "Material_Grade_Premium" in features:
+    user_data["Material_Grade_Premium"] = 1.0 if material_choice == "Premium" else 0.0
+if "Material_Grade_Standard" in features:
+    user_data["Material_Grade_Standard"] = 1.0 if material_choice == "Standard" else 0.0
+
+# Day of week encoding
+for day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]:
+    col = f"Day_of_Week_{day}"
+    if col in features:
+        user_data[col] = 1.0 if day_choice == day else 0.0
 
 # -----------------------------
 # Predict button
