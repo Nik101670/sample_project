@@ -11,7 +11,7 @@ def load_manufacturing_data():
     """Load the manufacturing dataset"""
     try:
         # Get the path to the CSV file - go up from frontend/pages to project root
-        csv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'model', 'manufacturing_dataset_1000_samples.csv')
+        csv_path = os.path.join(os.path.dirname(__file__), 'manufacturing_dataset_1000_samples.csv')
         df = pd.read_csv(csv_path)
         return df
     except Exception as e:

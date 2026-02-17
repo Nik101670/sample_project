@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 # Configuration
-API_URL = os.getenv("API_URL", "http://localhost:8000")
+API_URL = os.getenv("API_URL", "https://manufacturing-api-z7yd.onrender.com")
 
 
 def _display_model_metrics(API_URL):
