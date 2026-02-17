@@ -79,7 +79,7 @@ def _display_prediction_analysis(API_URL):
             )
             
             fig_scatter.update_layout(height=500, showlegend=True)
-            st.plotly_chart(fig_scatter, use_container_width=True)
+            st.plotly_chart(fig_scatter, width='stretch')
             
             # Error Distribution Charts
             col1, col2 = st.columns(2)
@@ -93,7 +93,7 @@ def _display_prediction_analysis(API_URL):
                     nbins=20
                 )
                 fig_error_hist.update_layout(height=400)
-                st.plotly_chart(fig_error_hist, use_container_width=True)
+                st.plotly_chart(fig_error_hist, width='stretch')
             
             with col2:
                 fig_error_box = px.box(
@@ -103,7 +103,7 @@ def _display_prediction_analysis(API_URL):
                     labels={'error_percentage': 'Error Percentage (%)'}
                 )
                 fig_error_box.update_layout(height=400)
-                st.plotly_chart(fig_error_box, use_container_width=True)
+                st.plotly_chart(fig_error_box, width='stretch')
             
             # Summary statistics
             with st.expander(" Error Statistics"):
@@ -163,7 +163,7 @@ def _display_feature_importance(API_URL):
                 height=600, 
                 yaxis={'categoryorder':'total ascending'}
             )
-            st.plotly_chart(fig_importance, use_container_width=True)
+            st.plotly_chart(fig_importance, width='stretch')
             
         else:
             st.error("Unable to fetch feature importance")

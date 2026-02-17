@@ -85,7 +85,7 @@ def _handle_prediction(API_URL, user_data, shift_choice, machine_choice, materia
             ))
             
             fig_gauge.update_layout(height=400, font={'color': "darkblue", 'family': "Arial"})
-            st.plotly_chart(fig_gauge, use_container_width=True)
+            st.plotly_chart(fig_gauge, width='stretch')
         
         with col2:
             # Performance categorization
@@ -163,5 +163,5 @@ if len(numeric_features) > 0:
 _encode_categorical_features(user_data, features, shift_choice, machine_choice, material_choice, day_choice)
     
 # Prediction button
-if st.button(" Predict Production Output", type="primary", use_container_width=True):
+if st.button(" Predict Production Output", type="primary", width='stretch'):
     _handle_prediction(API_URL, user_data, shift_choice, machine_choice, material_choice, day_choice, numeric_features)

@@ -284,7 +284,7 @@ if df is not None:
                             fig = create_feature_analysis_chart(df, feature, title_prefix=f"{feature_idx+1}. ")
                         
                         if fig:
-                            st.plotly_chart(fig, use_container_width=True)
+                            st.plotly_chart(fig, width='stretch')
                             show_feature_insights(df, feature)
         
         
