@@ -1,0 +1,1 @@
+# Pages package for Manufacturing Analytics Frontend
