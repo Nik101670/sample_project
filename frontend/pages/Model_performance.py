@@ -4,26 +4,10 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
+import os
 
-def show_performance_page(API_URL):
-    """Display the model performance dashboard"""
-    st.title("📊 Model Performance Dashboard")
-    
-    # Model Information Section
-    st.header("🤖 Model Information")
-    _display_model_metrics(API_URL)
-    
-    # Actual vs Predicted Section
-    st.header("🎯 Actual vs Predicted Analysis")
-    _display_prediction_analysis(API_URL)
-    
-    # Feature Importance Section
-    st.header("🔍 Feature Importance Analysis")
-    _display_feature_importance(API_URL)
-    
-    # Model Training History
-    st.header("📈 Training Performance")
-    _display_training_history(API_URL)
+# Configuration
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 
 def _display_model_metrics(API_URL):
@@ -43,31 +27,21 @@ def _display_model_metrics(API_URL):
             with col2:
                 st.metric(
                     "RMSE", 
-                    f"{model_info.get('rmse', 3.2):.2f}", 
+                    f"{model_info.get('rmse', 3.52):.2f}", 
                     help="Root Mean Square Error in parts/hour"
                 )
             with col3:
                 st.metric(
                     "MAE", 
-                    f"{model_info.get('mae', 2.1):.2f}", 
+                    f"{model_info.get('mae', 2.68):.2f}", 
                     help="Mean Absolute Error in parts/hour"
                 )
             with col4:
                 st.metric(
                     "Accuracy", 
-                    f"{100 - model_info.get('mape', 8.5):.1f}%", 
-                    help="Overall prediction accuracy"
+                    f"{100 - model_info.get('mape', 11.6):.1f}%",                   help="Overall prediction accuracy"
                 )
                 
-            # Additional model info
-            with st.expander("📋 Detailed Model Information"):
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.info(f"**Model Version:** {model_info.get('version', '2.0')}")
-                    st.info(f"**Features Count:** {model_info.get('features_count', 'N/A')}")
-                with col_b:
-                    st.info(f"**Training Samples:** {model_info.get('training_samples', 'N/A')}")
-                    st.info(f"**Test Samples:** {model_info.get('test_samples', 'N/A')}")
         else:
             st.error("Unable to fetch model information")
     except Exception as e:
@@ -132,7 +106,7 @@ def _display_prediction_analysis(API_URL):
                 st.plotly_chart(fig_error_box, use_container_width=True)
             
             # Summary statistics
-            with st.expander("📊 Error Statistics"):
+            with st.expander(" Error Statistics"):
                 col_a, col_b, col_c = st.columns(3)
                 with col_a:
                     st.metric("Mean Error", f"{df_test['error'].mean():.2f}")
@@ -191,63 +165,22 @@ def _display_feature_importance(API_URL):
             )
             st.plotly_chart(fig_importance, use_container_width=True)
             
-            # Feature importance summary
-            with st.expander("📋 Feature Insights"):
-                positive_features = df_importance[df_importance['direction'] == 'Positive'].head(5)
-                negative_features = df_importance[df_importance['direction'] == 'Negative'].head(5)
-                
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.success("**🔼 Top Positive Impact Features:**")
-                    for _, row in positive_features.iterrows():
-                        st.write(f"• {row['feature']}: +{row['importance']:.3f}")
-                
-                with col_b:
-                    st.error("**🔽 Top Negative Impact Features:**")
-                    for _, row in negative_features.iterrows():
-                        st.write(f"• {row['feature']}: {row['importance']:.3f}")
-            
         else:
             st.error("Unable to fetch feature importance")
     except Exception as e:
         st.error(f"Feature importance endpoint not available: {e}")
 
+st.title(" Model Performance Dashboard")
 
-def _display_training_history(API_URL):
-    """Display model training history"""
-    try:
-        training_res = requests.get(f"{API_URL}/training-history")
-        if training_res.status_code == 200:
-            training_data = training_res.json()
-            
-            if 'losses' in training_data:
-                df_training = pd.DataFrame({
-                    'epoch': range(1, len(training_data['losses']) + 1),
-                    'loss': training_data['losses']
-                })
-                
-                fig_training = px.line(
-                    df_training,
-                    x='epoch',
-                    y='loss',
-                    title='Model Training Loss Over Time',
-                    labels={'epoch': 'Training Epoch', 'loss': 'MSE Loss'}
-                )
-                
-                fig_training.update_layout(height=400)
-                st.plotly_chart(fig_training, use_container_width=True)
-                
-                # Training summary
-                with st.expander("🏋️ Training Summary"):
-                    col_a, col_b, col_c = st.columns(3)
-                    with col_a:
-                        st.metric("Total Epochs", training_data.get('epochs', 'N/A'))
-                    with col_b:
-                        st.metric("Final Loss", f"{training_data.get('final_loss', 0):.4f}")
-                    with col_c:
-                        improvement = (training_data['losses'][0] - training_data['losses'][-1]) / training_data['losses'][0] * 100
-                        st.metric("Loss Improvement", f"{improvement:.1f}%")
-        else:
-            st.info("Training history not available")
-    except Exception as e:
-        st.info(f"Training history endpoint not available: {e}")
+# Model Information Section
+st.header(" Model Information")
+_display_model_metrics(API_URL)
+
+# Actual vs Predicted Section
+st.header(" Actual vs Predicted Analysis")
+_display_prediction_analysis(API_URL)
+
+# Feature Importance Section
+st.header(" Feature Importance Analysis")
+_display_feature_importance(API_URL)
+
