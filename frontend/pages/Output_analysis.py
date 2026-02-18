@@ -23,7 +23,7 @@ def load_manufacturing_data():
         for csv_path in possible_paths:
             if os.path.exists(csv_path):
                 df = pd.read_csv(csv_path)
-                st.success(f"✅ Dataset loaded successfully: {len(df)} samples")
+                st.success(f"Dataset loaded successfully: {len(df)} samples")
                 return df
         
         # If no file found, create sample data to prevent 503 error
@@ -31,8 +31,8 @@ def load_manufacturing_data():
         return create_sample_data()
         
     except Exception as e:
-        st.error(f"❌ Error loading dataset: {e}")
-        st.info("🔧 Creating sample data to prevent service interruption...")
+        st.error(f" Error loading dataset: {e}")
+        st.info(" Creating sample data to prevent service interruption...")
         return create_sample_data()
 
 
@@ -76,7 +76,6 @@ def create_feature_analysis_chart(df, feature_name, output_col='Parts_Per_Hour',
         # Limit data size for performance (sample if too large)
         if len(df) > 500:
             df_sample = df.sample(n=500, random_state=42)
-            st.info(f"📉 Using random sample of 500 points for performance")
         else:
             df_sample = df.copy()
         
@@ -151,7 +150,7 @@ def create_feature_analysis_chart(df, feature_name, output_col='Parts_Per_Hour',
         return fig
         
     except Exception as e:
-        st.error(f"⚠️ Error creating chart for {feature_name}: {str(e)[:100]}...")
+        st.error(f" Error creating chart for {feature_name}: {str(e)[:100]}...")
         return None
 
 
@@ -214,7 +213,7 @@ def create_categorical_analysis_chart(df, feature_name, output_col='Parts_Per_Ho
         return fig
         
     except Exception as e:
-        st.error(f"⚠️ Error creating categorical chart for {feature_name}: {str(e)[:100]}...")
+        st.error(f" Error creating categorical chart for {feature_name}: {str(e)[:100]}...")
         return None
 
 
@@ -300,11 +299,11 @@ def show_feature_insights(df, feature_name, output_col='Parts_Per_Hour'):
 # Main Analytics Dashboard
 st.set_page_config(page_title="Manufacturing Analytics", layout="wide")
 
-st.title("🏭 Feature Impact Analysis")
-st.markdown("### 📊 Key Manufacturing Features vs Production Output")
+st.title(" Feature Impact Analysis")
+st.markdown("###  Key Manufacturing Features vs Production Output")
 
 # Add loading state
-with st.spinner('🔄 Loading manufacturing data...'):
+with st.spinner(' Loading manufacturing data...'):
     df = load_manufacturing_data()
 
 if df is not None:
@@ -347,18 +346,18 @@ if df is not None:
         st.divider()
         
         # Create visualizations for each feature
-        st.header("📈 Individual Feature Analysis")
+        st.header(" Individual Feature Analysis")
         
         # Add feature selection to reduce server load
         selected_features = st.multiselect(
             "Select features to analyze (choose fewer for faster loading):",
             available_features,
             default=available_features[:4],  # Default to first 4 to reduce load
-            help="💡 Tip: Select fewer features for faster loading on slower connections"
+            help=" Tip: Select fewer features for faster loading on slower connections"
         )
         
         if not selected_features:
-            st.warning("⚠️ Please select at least one feature to analyze")
+            st.warning(" Please select at least one feature to analyze")
         else:
             # Progress bar for better UX
             progress_bar = st.progress(0)
@@ -382,7 +381,7 @@ if df is not None:
                         # Update progress
                         progress = (feature_idx + 1) / len(selected_features)
                         progress_bar.progress(progress)
-                        status_text.text(f"📊 Analyzing {feature.replace('_', ' ')}... ({feature_idx + 1}/{len(selected_features)})")
+                        status_text.text(f" Analyzing {feature.replace('_', ' ')}... ({feature_idx + 1}/{len(selected_features)})")
                         
                         with cols[col_idx]:
                             try:
@@ -399,16 +398,16 @@ if df is not None:
                                     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
                                     show_feature_insights(df, feature)
                                 else:
-                                    st.error(f"❌ Could not create chart for {feature}")
+                                    st.error(f" Could not create chart for {feature}")
                                     
                             except Exception as e:
-                                st.error(f"⚠️ Error analyzing {feature}: {str(e)[:100]}...")
-                                st.info("💡 Try refreshing the page or selecting fewer features")
+                                st.error(f" Error analyzing {feature}: {str(e)[:100]}...")
+                                st.info(" Try refreshing the page or selecting fewer features")
             
             # Clear progress indicators
             progress_bar.empty()
             status_text.empty()
-            st.success(f"✅ Analysis complete! {len(selected_features)} features analyzed.")
+            st.success(f" Analysis complete! {len(selected_features)} features analyzed.")
         
         
         # Feature Importance Summary
@@ -461,7 +460,7 @@ if df is not None:
                         pass
 
 else:
-    st.error("❌ Could not load the manufacturing dataset.")
+    st.error(" Could not load the manufacturing dataset.")
     
     with st.expander("🔧 Troubleshooting Information"):
         st.write("**Possible solutions:**")
